@@ -5,7 +5,6 @@ from wtforms import StringField, PasswordField, SubmitField
 from wtforms.validators import DataRequired
 from flask_sqlalchemy import SQLAlchemy
 
-
 app = Flask('__name__')
 app.config['SECRET_KEY'] = 'blairehasmyheart'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://localhost/thoughtsweb'
@@ -35,6 +34,14 @@ class Edge(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(64))
     type = db.Column(db.String(64))
+
+
+class Note(db.Model):
+    __tablename__ = 'notes'
+    node = db.Column(db.String(64))
+    text = db.Column(db.String(5000))  # TODO enforce this char limit (or raise it?)
+    username = db.Column(db.String(64))
+    id = db.Column(db.Integer, primary_key=True)
 
 
 class LoginForm(FlaskForm):
@@ -121,14 +128,23 @@ def add_node():
                 username=session['name'],
                 type=request.get_json()['type'])
     db.session.add(node)
+    if request.get_json()['type'] == 'note':
+        note = Note(node=request.get_json()['label'],
+                    text='To be written...',
+                    username=session['name'])
+        db.session.add(note)
     db.session.commit()
     return ''
 
 
 @app.route('/remove_node', methods=['POST'])
 def remove_node():
-    Node.query.filter_by(label=request.get_json()['label'],
-                         username=session['name']).delete()
+    node = Node.query.filter_by(label=request.get_json()['label'],
+                                username=session['name']).first()
+    if node.type == 'note':
+        Note.query.filter_by(node=request.get_json()['label'],
+                             username=session['name']).delete()
+    db.session.delete(node)
     # Remove all edges having this node as a source or sink.
     Edge.query.filter_by(source=request.get_json()['label'],
                          username=session['name']).delete()

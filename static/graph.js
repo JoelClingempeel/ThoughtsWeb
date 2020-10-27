@@ -93,7 +93,7 @@ function add_parent_child() {
     }
 }
 
-async function get_start() {
+async function initialize() {
     let data = await call_api('graph_snapshot', '')
     for (i = 0; i < data['nodes'].length; i++) {
         node = data['nodes'][i]
@@ -109,4 +109,4 @@ async function get_start() {
     }
 }
 
-get_start();
+initialize();
