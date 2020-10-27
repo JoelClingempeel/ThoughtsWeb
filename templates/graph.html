@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+{% block main %}
+   <style type="text/css">
+        #mynetwork {
+          width: 1000px;
+          height: 400px;
+          border: 1px solid lightgray;
+        }
+    </style>
+    <center>
+        <div id="mynetwork"></div>
+        <br />
+        <div id="mycontrols">
+            <button onclick="add_node();">Add Node</button>
+            <button onclick="remove_node();">Remove Node</button>
+            <button onclick="add_edge();">Add Edge</button>
+            <button onclick="remove_edge();">Remove Edge</button>
+        </div>
+        <br />
+        <div id="mydisplay">
+            <textarea id="paragraph_display" rows="15" cols="82"></textarea>
+        </div>
+        <div id="userlinks"></div>
+    </center>
+    <script type="text/javascript" src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
+    <script src="{{ url_for('static', filename='graph.js') }}"></script>
+{% endblock %}

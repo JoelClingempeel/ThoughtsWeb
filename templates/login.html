@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+{% block main %}
+Hello and welcome!
+<br>
+<br>
+Please login.
+<form method="post">
+    {{ form.hidden_tag() }}
+    {{ form.name.label }} <br>  {{ form.name() }} <br>
+    {{ form.password.label }} <br> {{ form.password() }} <br>
+    {{ form.submit() }}
+</form>
+<br>
+<br>
+Alternatively, if you do not have an account, please
+<a href="{{ url_for('signup') }}">signup.</a>
+<br>
+<a href="{{ url_for('index') }}">Return home</a>
+{% endblock %}

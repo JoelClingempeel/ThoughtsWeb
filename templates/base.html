@@ -1,0 +1,41 @@
+<!doctype html>
+<html>
+<head>
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
+<div class="topbar">
+  <div class="topbarContent">
+    The Web of Thoughts
+  </div>
+</div>
+
+<div class="sidebar">
+  {% if session.get('name') %}
+    <center>
+        Hello {{ session['name'] }}
+    </center>
+  {% endif %}
+  <a href="{{ url_for('index') }}"> Home </a>
+  <a href="{{ url_for('graph') }}"> Explore Graph </a>
+  {% if session.get('name') %}
+    <!-- TODO add profile here -->
+    <a href="{{ url_for('logout') }}"> Logout </a>
+  {% else %}
+    <a href="{{ url_for('login') }}"> Login </a>
+    <a href="{{ url_for('signup') }}"> Signup </a>
+  {% endif %}
+</div>
+</head>
+
+<body>
+<br>
+<br>
+<br>
+<br>
+<br>
+<div class="main">
+  {% block main %} Content goes here {% endblock %}
+</div>
+</body>
+
+</html>
