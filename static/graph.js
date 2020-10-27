@@ -41,7 +41,7 @@ function add_node() {
     if(!network.body.data.nodes.get(node)) {
         network.body.data.nodes.add([{ id: node, label: node }]);
      }
-     call_api('add_node', { label: node })
+     call_api('add_node', { label: node, type: 'entity' })
 }
 
 function remove_node() {
@@ -59,7 +59,7 @@ function add_edge() {
     if(!network.body.data.edges.get(node1 + '/' + node2) &&
        !network.body.data.edges.get(node2 + '/' + node1)) {
        network.body.data.edges.add([{ from: node1, to: node2, id: node1 + '/' + node2, label: edge_label }]);
-       call_api('add_edge', { source: node1, sink: node2, label: edge_label })
+       call_api('add_edge', { source: node1, sink: node2, label: edge_label, type: 'semantic' })
     }
 }
 
@@ -72,11 +72,27 @@ function remove_edge() {
     call_api('remove_edge', { source: pair[0], sink: pair[1] })
 }
 
+function add_note() {
+    if (selectedNode == '') {
+            return;
+    }
+    var node = prompt('Please enter a name for your note.');
+    network.body.data.nodes.add([{ id: node, label: node, color: 'red'}]);
+    call_api('add_node', { label: node, type: 'note'  })
+    network.body.data.edges.add([{ from: selectedNode, to: node, id: selectedNode + '/' + node, label: '*' }]);
+    call_api('add_edge', { source: selectedNode, sink: node, label: '*', type: 'note' })
+}
+
 async function get_start() {
     let data = await call_api('graph_snapshot', '')
     for (i = 0; i < data['nodes'].length; i++) {
         node = data['nodes'][i]
-        network.body.data.nodes.add([{ id: node, label: node }]);
+        if (node[1] == 'entity') {
+            node_color = 'blue';
+        } else {
+            node_color = 'red';
+        }
+        network.body.data.nodes.add([{ id: node[0], label: node[0], color: node_color }]);
     }
     for (j = 0; j < data['edges'].length; j++) {
         edge = data['edges'][j]

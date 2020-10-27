@@ -4,27 +4,6 @@ from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, SubmitField
 from wtforms.validators import DataRequired
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy.dialects.postgresql import ARRAY
-from sqlalchemy.ext.mutable import Mutable
-
-
-class MutableList(Mutable, list):
-    def append(self, value):
-        list.append(self, value)
-        self.changed()
-
-    def remove(self, value):
-        list.remove(self, value)
-        self.changed()
-
-    @classmethod
-    def coerce(cls, key, value):
-        if not isinstance(value, MutableList):
-            if isinstance(value, list):
-                return MutableList(value)
-            return Mutable.coerce(key, value)
-        else:
-            return value
 
 
 app = Flask('__name__')
@@ -44,8 +23,8 @@ class Node(db.Model):
     __tablename__ = 'nodes'
     label = db.Column(db.String(64))
     id = db.Column(db.Integer, primary_key=True)
-    neighbors = db.Column(MutableList.as_mutable(ARRAY(db.String(64))))
     username = db.Column(db.String(64))
+    type = db.Column(db.String(64))
 
 
 class Edge(db.Model):
@@ -55,6 +34,7 @@ class Edge(db.Model):
     label = db.Column(db.String(64))
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(64))
+    type = db.Column(db.String(64))
 
 
 class LoginForm(FlaskForm):
@@ -138,8 +118,8 @@ def graph():
 @app.route('/add_node', methods=['POST'])
 def add_node():
     node = Node(label=request.get_json()['label'],
-                neighbors=[],
-                username=session['name'])
+                username=session['name'],
+                type=request.get_json()['type'])
     db.session.add(node)
     db.session.commit()
     return ''
@@ -147,9 +127,8 @@ def add_node():
 
 @app.route('/remove_node', methods=['POST'])
 def remove_node():
-    node = Node.query.filter_by(label=request.get_json()['label'],
-                                username=session['name']).first()
-    db.session.delete(node)
+    Node.query.filter_by(label=request.get_json()['label'],
+                         username=session['name']).delete()
     # Remove all edges having this node as a source or sink.
     Edge.query.filter_by(source=request.get_json()['label'],
                          username=session['name']).delete()
@@ -164,7 +143,8 @@ def add_edge():
     edge = Edge(source=request.get_json()['source'],
                 sink=request.get_json()['sink'],
                 label=request.get_json()['label'],
-                username=session['name'])
+                username=session['name'],
+                type=request.get_json()['type'])
     db.session.add(edge)
     db.session.commit()
     return ''
@@ -184,7 +164,7 @@ def remove_edge():
 def graph_snapshot():
     nodes = Node.query.filter_by(username=session['name']).all()
     edges = Edge.query.filter_by(username=session['name']).all()
-    return json.dumps({'nodes': [node.label for node in nodes],
+    return json.dumps({'nodes': [[node.label, node.type] for node in nodes],
                        'edges': [[edge.source, edge.sink, edge.label] for edge in edges]})
 
 
