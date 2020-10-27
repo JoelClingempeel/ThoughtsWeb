@@ -176,6 +176,16 @@ def remove_edge():
     return ''
 
 
+@app.route('/get_note', methods=['POST'])
+def get_note():
+    note = Note.query.filter_by(node=request.get_json()['node'],
+                                username=session['name']).first()
+    if note:
+        return json.dumps({'note': note.text})
+    else:
+        return json.dumps({'note': ''})
+
+
 @app.route('/graph_snapshot', methods=['POST'])
 def graph_snapshot():
     nodes = Node.query.filter_by(username=session['name']).all()

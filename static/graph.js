@@ -23,12 +23,22 @@ async function call_api(query_type, query_data) {
   return myData;
 }
 
+async function update_display_text(note_label) {
+    if (note_label == '') {
+        document.getElementById('paragraph_display').innerHTML = '';
+    } else {
+        let display_text = await call_api('get_note', { node: note_label });
+        document.getElementById('paragraph_display').innerHTML = display_text['note'];
+    }
+}
+
 network.on('click', function(params) {
     if(params['nodes'].length > 0) {
       selectedNode = params['nodes'][0]
     } else {
       selectedNode = ''
     }
+    update_display_text(selectedNode)
     if(params['edges'].length > 0){
       selectedEdge = params['edges']
     } else {
@@ -81,6 +91,7 @@ function add_note() {
     call_api('add_node', { label: note, type: 'note'  })
     network.body.data.edges.add([{ from: note, to: selectedNode, id: note + '/' + selectedNode, label: '--->' }]);
     call_api('add_edge', { source: note, sink: selectedNode, label: '--->', type: 'note' })
+    update_display_text(note)
 }
 
 function add_parent_child() {
