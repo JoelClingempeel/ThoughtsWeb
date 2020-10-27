@@ -76,11 +76,21 @@ function add_note() {
     if (selectedNode == '') {
             return;
     }
-    var node = prompt('Please enter a name for your note.');
-    network.body.data.nodes.add([{ id: node, label: node, color: 'red'}]);
-    call_api('add_node', { label: node, type: 'note'  })
-    network.body.data.edges.add([{ from: selectedNode, to: node, id: selectedNode + '/' + node, label: '*' }]);
-    call_api('add_edge', { source: selectedNode, sink: node, label: '*', type: 'note' })
+    var note = prompt('Please enter a name for your note.');
+    network.body.data.nodes.add([{ id: note, label: note, color: 'red'}]);
+    call_api('add_node', { label: note, type: 'note'  })
+    network.body.data.edges.add([{ from: note, to: selectedNode, id: note + '/' + selectedNode, label: '--->' }]);
+    call_api('add_edge', { source: note, sink: selectedNode, label: '--->', type: 'note' })
+}
+
+function add_parent_child() {
+    var parent = prompt('Please enter parent node.');
+    var child = prompt('Please enter node node.');
+    if(!network.body.data.edges.get(child + '/' + parent) &&
+       !network.body.data.edges.get(parent + '/' + child)) {
+       network.body.data.edges.add([{ from: child, to: parent, id: child + '/' + parent, label: '--->' }]);
+       call_api('add_edge', { source: child, sink: parent, label: '--->', type: 'hierarchical' })
+    }
 }
 
 async function get_start() {
@@ -88,11 +98,10 @@ async function get_start() {
     for (i = 0; i < data['nodes'].length; i++) {
         node = data['nodes'][i]
         if (node[1] == 'entity') {
-            node_color = 'blue';
+            network.body.data.nodes.add([{ id: node[0], label: node[0] }]);
         } else {
-            node_color = 'red';
+            network.body.data.nodes.add([{ id: node[0], label: node[0], color: 'red' }]);
         }
-        network.body.data.nodes.add([{ id: node[0], label: node[0], color: node_color }]);
     }
     for (j = 0; j < data['edges'].length; j++) {
         edge = data['edges'][j]
