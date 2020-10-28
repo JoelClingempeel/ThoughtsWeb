@@ -1,16 +1,17 @@
 {% extends 'base.html' %}
 {% block main %}
    <style type="text/css">
-        #mynetwork {
+        #network_panel {
           width: 1000px;
           height: 400px;
           border: 1px solid lightgray;
         }
     </style>
     <center>
-        <div id="mynetwork"></div>
+        <div id="network_panel"></div>
         <br />
-        <div id="mycontrols">
+        <div id="controls">
+
             Display Options: <br />
             <button onclick="restrict_to_children();">Restrict to Children</button>
             <button onclick="show_entire_graph();">Show Entire Graph</button>
@@ -31,8 +32,7 @@
 
         </div>
         <br />
-        <div id="paragraph_display"></div>
-        <div id="userlinks"></div>
+        <div id="note_display"></div>
     </center>
     <script type="text/javascript" src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
     <script src="{{ url_for('static', filename='graph.js') }}"></script>
