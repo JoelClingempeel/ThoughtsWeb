@@ -212,5 +212,26 @@ def graph_snapshot():
                        'edges': [[edge.source, edge.sink, edge.label] for edge in edges]})
 
 
+@app.route('/get_children', methods=['POST'])
+def get_children():
+    children = Edge.query.filter_by(sink=request.get_json()['root'],
+                                    username=session['name'],
+                                    type='hierarchical').all()
+    nodes = []
+    for child in children:
+        node = Node.query.filter_by(label=child.source,
+                                    username=session['name']).first()
+        nodes.append([node.label, node.type])
+    node_labels = [node[0] for node in nodes]
+
+    edges = []
+    all_edges = Edge.query.filter_by(username=session['name']).all()
+    for edge in all_edges:
+        if edge.source in node_labels and edge.sink in node_labels:
+            edges.append([edge.source, edge.sink, edge.label])
+
+    return json.dumps({'nodes': nodes, 'edges': edges})
+
+
 if __name__ == '__main__':
-    app.run()
+    app.run(debug=True)

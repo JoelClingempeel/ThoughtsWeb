@@ -120,4 +120,31 @@ async function initialize() {
     }
 }
 
+function clear_graph() {
+    data = {
+        nodes: new vis.DataSet([]),
+        edges: new vis.DataSet([])
+    };
+    network = new vis.Network(document.getElementById('mynetwork'), data, {});
+    selectedNode = ''
+    selectedEdge = ''
+}
+
+async function show_only_children() {
+    let data = await call_api('get_children', { root: selectedNode })
+    clear_graph();
+    for (i = 0; i < data['nodes'].length; i++) {
+        node = data['nodes'][i]
+        if (node[1] == 'entity') {
+            network.body.data.nodes.add([{ id: node[0], label: node[0] }]);
+        } else {
+            network.body.data.nodes.add([{ id: node[0], label: node[0], color: 'red' }]);
+        }
+    }
+    for (j = 0; j < data['edges'].length; j++) {
+        edge = data['edges'][j]
+        network.body.data.edges.add([{ from: edge[0], to: edge[1], id: edge[0] + '/' + edge[1], label: edge[2] }]);
+    }
+}
+
 initialize();
