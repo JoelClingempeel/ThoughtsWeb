@@ -240,12 +240,14 @@ def get_neighbors():
     out_edges = Edge.query.filter_by(source=request.get_json()['node'],
                                      username=session['name']).all()
     node_labels = [edge.source for edge in in_edges] + [edge.sink for edge in out_edges]
+    print(node_labels)
 
     nodes = []
     for label in node_labels:
         node = Node.query.filter_by(label=label,
                                     username=session['name']).first()
         nodes.append([node.label, node.type])
+    node_labels.append(request.get_json()['node'])  # Needed for finding edge relations
 
     edges = []
     all_edges = Edge.query.filter_by(username=session['name']).all()
@@ -253,6 +255,8 @@ def get_neighbors():
         if edge.source in node_labels and edge.sink in node_labels:
             edges.append([edge.source, edge.sink, edge.label])
 
+    print(nodes)
+    print(edges)
     return json.dumps({'nodes': nodes, 'edges': edges})
 
 

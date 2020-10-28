@@ -1,3 +1,5 @@
+const url = 'http://' + window.location.href.split('/')[2] + '/'
+
 var data = {
     nodes: new vis.DataSet([]),
     edges: new vis.DataSet([])
@@ -5,7 +7,7 @@ var data = {
 var network = new vis.Network(document.getElementById('mynetwork'), data, {});
 var selectedNode = ''
 var selectedEdge = ''
-const url = 'http://' + window.location.href.split('/')[2] + '/'
+var node_list;
 
 async function call_api(query_type, query_data) {
   let myData;
@@ -38,7 +40,6 @@ network.on('click', function(params) {
     } else {
       selectedNode = ''
     }
-    console.log('Selected: ', selectedNode)
     update_display_text(selectedNode)
     if(params['edges'].length > 0){
       selectedEdge = params['edges']
@@ -123,16 +124,13 @@ function restore_graph(data) {
 async function initialize() {
     let data = await call_api('graph_snapshot', '')
     restore_graph(data)
+    node_list = data['nodes']
 }
 
 function clear_graph() {
-    data = {
-        nodes: new vis.DataSet([]),
-        edges: new vis.DataSet([])
-    };
-    network = new vis.Network(document.getElementById('mynetwork'), data, {});
-    selectedNode = ''
-    selectedEdge = ''
+    for (i = 0; i < node_list.length; i++) {
+        network.body.data.nodes.remove(node_list[i]);
+    }
 }
 
 async function restrict_to_children() {
