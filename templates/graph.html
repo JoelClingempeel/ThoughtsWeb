@@ -11,14 +11,24 @@
         <div id="mynetwork"></div>
         <br />
         <div id="mycontrols">
+            Display Options: <br />
+            <button onclick="restrict_to_children();">Restrict to Children</button>
+            <button onclick="show_entire_graph();">Show Entire Graph</button>
+            <br />
+            <button onclick="expand_node();">Expand Node</button>
+            <button onclick="hide_node();">Hide Node</button>
+            <br />
+            Edit Options:
+            <br />
             <button onclick="add_node();">Add Node</button>
             <button onclick="remove_node();">Remove Node</button>
+            <br />
             <button onclick="add_edge();">Add Edge</button>
             <button onclick="remove_edge();">Remove Edge</button>
+            <br />
             <button onclick="add_note();">Add Note</button>
             <button onclick="add_parent_child();">Add Parent/Child Relation</button>
-            <button onclick="show_only_children();">Show Only Children</button>
-            <button onclick="restore_graph();">Restore Graph</button>
+
         </div>
         <br />
         <div id="paragraph_display"></div>

@@ -38,6 +38,7 @@ network.on('click', function(params) {
     } else {
       selectedNode = ''
     }
+    console.log('Selected: ', selectedNode)
     update_display_text(selectedNode)
     if(params['edges'].length > 0){
       selectedEdge = params['edges']
@@ -104,8 +105,7 @@ function add_parent_child() {
     }
 }
 
-async function initialize() {
-    let data = await call_api('graph_snapshot', '')
+function restore_graph(data) {
     for (i = 0; i < data['nodes'].length; i++) {
         node = data['nodes'][i]
         if (node[1] == 'entity') {
@@ -118,6 +118,11 @@ async function initialize() {
         edge = data['edges'][j]
         network.body.data.edges.add([{ from: edge[0], to: edge[1], id: edge[0] + '/' + edge[1], label: edge[2] }]);
     }
+}
+
+async function initialize() {
+    let data = await call_api('graph_snapshot', '')
+    restore_graph(data)
 }
 
 function clear_graph() {
@@ -130,26 +135,30 @@ function clear_graph() {
     selectedEdge = ''
 }
 
-async function show_only_children() {
+async function restrict_to_children() {
     let data = await call_api('get_children', { root: selectedNode })
     clear_graph();
-    for (i = 0; i < data['nodes'].length; i++) {
-        node = data['nodes'][i]
-        if (node[1] == 'entity') {
-            network.body.data.nodes.add([{ id: node[0], label: node[0] }]);
-        } else {
-            network.body.data.nodes.add([{ id: node[0], label: node[0], color: 'red' }]);
-        }
-    }
-    for (j = 0; j < data['edges'].length; j++) {
-        edge = data['edges'][j]
-        network.body.data.edges.add([{ from: edge[0], to: edge[1], id: edge[0] + '/' + edge[1], label: edge[2] }]);
-    }
+    restore_graph(data);
 }
 
-function restore_graph() {
+function show_entire_graph() {
     clear_graph();
     initialize();
+}
+
+async function expand_node() {
+    if (selectedNode == '') {
+        return;
+    }
+    let data = await call_api('get_neighbors', { node: selectedNode });
+    restore_graph(data);
+}
+
+function hide_node() {
+    if (selectedNode == '') {
+        return;
+    }
+    network.body.data.nodes.remove(selectedNode);
 }
 
 initialize();
