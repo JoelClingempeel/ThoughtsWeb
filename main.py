@@ -1,7 +1,7 @@
 import json
 from flask import render_template, session, request, redirect, url_for, Flask
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, SubmitField
+from wtforms import StringField, PasswordField, SubmitField, TextAreaField
 from wtforms.validators import DataRequired
 from flask_sqlalchemy import SQLAlchemy
 
@@ -55,6 +55,11 @@ class SignupForm(FlaskForm):
     password1 = PasswordField('Enter the password.')
     password2 = PasswordField('Verify the password.')
     password_beta = PasswordField('Enter your beta testing password.')
+    submit = SubmitField('submit')
+
+
+class EditNoteForm(FlaskForm):
+    text = TextAreaField('')
     submit = SubmitField('submit')
 
 
@@ -122,6 +127,17 @@ def graph():
     return render_template("graph.html")
 
 
+@app.route('/edit_note/<node>', methods=['GET', 'POST'])
+def edit_note(node):
+    current_text = Note.query.filter_by(node=node, username=session['name']).first()
+    edit_note_form = EditNoteForm()
+    if request.method == 'POST':
+        current_text.text = edit_note_form.text.data
+        db.session.commit()
+    edit_note_form.text.data = current_text.text
+    return render_template('edit_note.html', form=edit_note_form)
+
+
 @app.route('/add_node', methods=['POST'])
 def add_node():
     node = Node(label=request.get_json()['label'],
@@ -181,7 +197,9 @@ def get_note():
     note = Note.query.filter_by(node=request.get_json()['node'],
                                 username=session['name']).first()
     if note:
-        return json.dumps({'note': note.text})
+        # TODO Remove using explicit link.
+        prefix = f'<a href="http://127.0.0.1:5000/edit_note/{note.node}"> Edit </a> <br />'
+        return json.dumps({'note': prefix + note.text})
     else:
         return json.dumps({'note': ''})
 

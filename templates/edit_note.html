@@ -1,0 +1,9 @@
+{% extends 'base.html' %}
+{% block main %}
+    <h2>Edit Note</h2>
+    <form method="post">
+        {{ form.text() }} <br />
+        {{ form.submit() }} <br />
+    </form>
+    <a href="http://127.0.0.1:5000/graph">Return to Graph</a>
+{% endblock %}
