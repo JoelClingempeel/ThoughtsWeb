@@ -147,4 +147,9 @@ async function show_only_children() {
     }
 }
 
+function restore_graph() {
+    clear_graph();
+    initialize();
+}
+
 initialize();
