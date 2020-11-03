@@ -103,7 +103,6 @@ async function expand_node() {
         return;
     }
     let data = await call_api('get_neighbors', { node: selectedNode });
-    console.log(data)
     restore_graph(data);
 }
 
@@ -114,6 +113,36 @@ function hide_node() {
     network.body.data.nodes.remove(selectedNode);
 }
 
+async function show_notes() {
+    if (selectedNode == '') {
+        return;
+    }
+    let data = await call_api('get_notes', { node: selectedNode });
+    restore_graph(data);
+}
+
+async function hide_notes() {
+    if (selectedNode == '') {
+        return;
+    }
+    let data = await call_api('get_notes', { node: selectedNode });
+    for (i = 0; i < data['nodes'].length; i++) {
+        node = data['nodes'][i]
+        network.body.data.nodes.remove([{ id: node[0],
+                                          label: node[0] }]);
+
+    }
+    for (j = 0; j < data['edges'].length; j++) {
+        edge = data['edges'][j]
+        network.body.data.edges.remove([{ from: edge[0],
+                                          to: edge[1],
+                                          id: edge[0] + '/' + edge[1],
+                                          label: edge[2],
+                                          arrows: 'to' }]);
+     }
+
+}
+
 function add_node() {
     var node = prompt('Please enter a label for your new node.', 'Label goes here.');
     if(!network.body.data.nodes.get(node)) {
@@ -121,7 +150,7 @@ function add_node() {
                                        label: node }]);
      }
      call_api('add_node', { label: node,
-                            type: 'entity' })
+                            type: 'entity' });
 }
 
 function remove_node() {
