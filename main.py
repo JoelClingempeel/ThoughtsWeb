@@ -206,10 +206,11 @@ def get_note():
 
 @app.route('/graph_snapshot', methods=['POST'])
 def graph_snapshot():
-    nodes = Node.query.filter_by(username=session['name']).all()
+    nodes = Node.query.filter_by(username=session['name'], type='entity').all()
     edges = Edge.query.filter_by(username=session['name']).all()
     return json.dumps({'nodes': [[node.label, node.type] for node in nodes],
-                       'edges': [[edge.source, edge.sink, edge.label] for edge in edges]})
+                       'edges': [[edge.source, edge.sink, edge.label]
+                                 for edge in edges if edge.type != 'note']})
 
 
 @app.route('/get_children', methods=['POST'])
@@ -244,14 +245,15 @@ def get_neighbors():
     nodes = []
     for label in node_labels:
         node = Node.query.filter_by(label=label,
-                                    username=session['name']).first()
+                                    username=session['name'],
+                                    type='entity').first()
         nodes.append([node.label, node.type])
     node_labels.append(request.get_json()['node'])  # Needed for finding edge relations
 
     edges = []
     all_edges = Edge.query.filter_by(username=session['name']).all()
     for edge in all_edges:
-        if edge.source in node_labels and edge.sink in node_labels:
+        if edge.source in node_labels and edge.sink in node_labels and edge.type != 'note':
             edges.append([edge.source, edge.sink, edge.label])
 
     return json.dumps({'nodes': nodes, 'edges': edges})
