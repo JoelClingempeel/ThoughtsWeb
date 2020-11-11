@@ -25,13 +25,19 @@ async function call_api(query_type, query_data) {
   return myData;
 }
 
-async function update_display_text(note_label) {
-    if (note_label == '') {
+async function update_display_text(node) {
+    if (node == '') {
+        document.getElementById('privacy_display').innerHTML = '';
         document.getElementById('note_display').innerHTML = '';
-    } else {
-        let display_text = await call_api('get_note', { node: note_label });
-        document.getElementById('note_display').innerHTML = display_text['note'];
+        return;
     }
+    let display_text = await call_api('get_node_data', { node: node });
+    if( display_text['private'] == 'true') {
+        document.getElementById('privacy_display').innerHTML = 'This node is currently <b>private</b>.';
+    } else {
+        document.getElementById('privacy_display').innerHTML = 'This node is currently <b>public</b>.';
+    }
+    document.getElementById('note_display').innerHTML = display_text['note'];
 }
 
 network.on('click', function(params) {

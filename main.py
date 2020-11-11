@@ -24,6 +24,7 @@ class Node(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(64))
     type = db.Column(db.String(64))
+    private = db.Column(db.Boolean)
 
 
 class Edge(db.Model):
@@ -192,16 +193,22 @@ def remove_edge():
     return ''
 
 
-@app.route('/get_note', methods=['POST'])
-def get_note():
+@app.route('/get_node_data', methods=['POST'])
+def get_node_data():
+    # Get privacy.
+    private = Node.query.filter_by(label=request.get_json()['node'],
+                                   username=session['name']).first().private
+    # Get note (if applicable).
     note = Note.query.filter_by(node=request.get_json()['node'],
                                 username=session['name']).first()
     if note:
         # TODO Remove using explicit link.
         prefix = f'<a href="http://127.0.0.1:5000/edit_note/{note.node}"> Edit </a> <br />'
-        return json.dumps({'note': prefix + note.text})
+        note_data = prefix + note.text
     else:
-        return json.dumps({'note': ''})
+        note_data = ''
+    return json.dumps({'private': str(private),
+                       'note': note_data})
 
 
 @app.route('/graph_snapshot', methods=['POST'])
