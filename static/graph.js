@@ -32,10 +32,12 @@ async function update_display_text(node) {
         return;
     }
     let display_text = await call_api('get_node_data', { node: node });
-    if( display_text['private'] == 'true') {
-        document.getElementById('privacy_display').innerHTML = 'This node is currently <b>private</b>.';
+    if( display_text['private'] == 'True') {
+        document.getElementById('privacy_display').innerHTML = 'This node is currently <b>private</b>.  ' +
+        '<button onclick="toggle_privacy();">Toggle Privacy</button>';
     } else {
-        document.getElementById('privacy_display').innerHTML = 'This node is currently <b>public</b>.';
+        document.getElementById('privacy_display').innerHTML = 'This node is currently <b>public</b>.  ' +
+        '<button onclick="toggle_privacy();">Toggle Privacy</button>';
     }
     document.getElementById('note_display').innerHTML = display_text['note'];
 }
@@ -231,6 +233,11 @@ function add_parent_child() {
                               label: '--->',
                               type: 'hierarchical' })
     }
+}
+
+async function toggle_privacy() {
+    await call_api('toggle_privacy', { node: selectedNode });
+    update_display_text(selectedNode)
 }
 
 initialize();

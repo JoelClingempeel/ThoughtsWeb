@@ -287,5 +287,14 @@ def get_notes():
     return json.dumps({'nodes': nodes, 'edges': edges})
 
 
+@app.route('/toggle_privacy', methods=['POST'])
+def toggle_privacy():
+    node = Node.query.filter_by(label=request.get_json()['node'],
+                                username=session['name']).first()
+    node.private = not node.private
+    db.session.commit()
+    return json.dumps({})
+
+
 if __name__ == '__main__':
     app.run(debug=True)
