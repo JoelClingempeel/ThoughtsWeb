@@ -198,6 +198,10 @@ def get_node_data():
     # Get privacy.
     private = Node.query.filter_by(label=request.get_json()['node'],
                                    username=session['name']).first().private
+    # Get Note count.
+    num_notes = Edge.query.filter_by(sink=request.get_json()['node'],
+                                     username=session['name'],
+                                     type='note').count()
     # Get note (if applicable).
     note = Note.query.filter_by(node=request.get_json()['node'],
                                 username=session['name']).first()
@@ -208,6 +212,7 @@ def get_node_data():
     else:
         note_data = ''
     return json.dumps({'private': str(private),
+                       'num_notes': str(num_notes),
                        'note': note_data})
 
 
