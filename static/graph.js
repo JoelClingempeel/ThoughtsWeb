@@ -32,18 +32,30 @@ async function update_display_text(node) {
         return;
     }
     let display_text = await call_api('get_node_data', { node: node });
-    if (display_text['private'] == 'True') {
-        document.getElementById('privacy_display').innerHTML = 'This node is currently <b>private</b>.  ' +
-        '<button onclick="toggle_privacy();">Toggle Privacy</button>';
-    } else {
-        document.getElementById('privacy_display').innerHTML = 'This node is currently <b>public</b>.  ' +
-        '<button onclick="toggle_privacy();">Toggle Privacy</button>';
+    if (display_text['is_global' == 'False']) {
+        if (display_text['private'] == 'True') {
+            document.getElementById('privacy_display').innerHTML = 'This node is currently <b>private</b>.  ' +
+            '<button onclick="toggle_privacy();">Toggle Privacy</button>';
+        } else {
+            document.getElementById('privacy_display').innerHTML = 'This node is currently <b>public</b>.  ' +
+            '<button onclick="toggle_privacy();">Toggle Privacy</button>';
+        }
+        if (display_text['num_notes'] != '0' && display_text['note'] == '') {
+            document.getElementById('note_count').innerHTML = 'Notes:  ' + display_text['num_notes'] +
+            '<button onclick="show_notes();">Show Notes</button> <button onclick="hide_notes();">Hide Notes</button>';
+        } else if (display_text['note'] == '') {
+            document.getElementById('note_count').innerHTML = 'This node has no notes.';
+        } else {
+            document.getElementById('note_count').innerHTML = '';
+        }
     }
-    if (display_text['num_notes'] != '0') {
-        document.getElementById('note_count').innerHTML = 'Notes:  ' + display_text['num_notes'] +
-        '<button onclick="show_notes();">Show Notes</button> <button onclick="hide_notes();">Hide Notes</button>';
+    if (display_text['num_global_notes'] != '0') {
+        document.getElementById('global_note_count').innerHTML = 'Global Notes:  ' + display_text['num_global_notes'] +
+        '<button onclick="global_show_notes();">Show Global Notes</button>';
     } else if (display_text['note'] == '') {
-        document.getElementById('note_count').innerHTML = 'This node has no notes.';
+        document.getElementById('global_note_count').innerHTML = 'This node has no global notes.';
+    } else {
+        document.getElementById('global_note_count').innerHTML = '';
     }
     document.getElementById('note_display').innerHTML = display_text['note'];
 }

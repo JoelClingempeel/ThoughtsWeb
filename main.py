@@ -195,28 +195,42 @@ def remove_edge():
 
 @app.route('/get_node_data', methods=['POST'])
 def get_node_data():  # TODO Add better handling of global nodes.
-    # Get privacy.
-    private = Node.query.filter_by(label=request.get_json()['node'],
+    # Get global-ness and privacy.
+    node_ob = Node.query.filter_by(label=request.get_json()['node'],
                                    username=session['name']).first()
-    if private:
-        private = private.private
+    if node_ob:
+        is_global = False
+        private = node_ob.private
     else:
+        is_global = True
         private = False
     # Get Note count.
     num_notes = Edge.query.filter_by(sink=request.get_json()['node'],
                                      username=session['name'],
                                      type='note').count()
+    # Get Global Note count.
+    num_global_notes = 0
+    global_note_edges = Edge.query.filter_by(sink=request.get_json()['node'],
+                                             type='note').all()
+    for edge in global_note_edges:
+        note_nodes = Node.query.filter_by(label=edge.source, private=False).all()
+        for node in note_nodes:
+            if node.username != session['name']:
+                num_global_notes += 1
     # Get note (if applicable).
-    note = Note.query.filter_by(node=request.get_json()['node'],
-                                username=session['name']).first()
+    note = Note.query.filter_by(node=request.get_json()['node']).first()
     if note:
         # TODO Remove using explicit link.
-        prefix = f'<a href="http://127.0.0.1:5000/edit_note/{note.node}"> Edit </a> <br />'
-        note_data = prefix + note.text
+        if note.username == session['name']:
+            note_data = f'<a href="http://127.0.0.1:5000/edit_note/{note.node}"> Edit </a> <br />' + note.text
+        else:
+            note_data = note.text
     else:
         note_data = ''
-    return json.dumps({'private': str(private),
+    return json.dumps({'is_global': str(is_global),
+                       'private': str(private),
                        'num_notes': str(num_notes),
+                       'num_global_notes': str(num_global_notes),
                        'note': note_data})
 
 
