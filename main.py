@@ -410,6 +410,16 @@ def get_global_notes():
     return json.dumps({'nodes': nodes, 'edges': edges})
 
 
+@app.route('/node_search', methods=['POST'])
+def node_search():
+    query = request.get_json()['query']
+    nodes = Node.query.filter_by(type='entity',
+                                 private=False).all()
+    results = [[node.label, 'global_entity'] for node in nodes
+               if query in node.label]
+    return json.dumps({'nodes': results, 'edges': []})
+
+
 @app.route('/toggle_privacy', methods=['POST'])
 def toggle_privacy():
     node = Node.query.filter_by(label=request.get_json()['node'],

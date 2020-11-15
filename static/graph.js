@@ -296,6 +296,12 @@ function add_parent_child() {
     }
 }
 
+async function search_for_nodes() {
+    let query = document.getElementById('node_search').value;
+    let data = await call_api('node_search', { query: query });
+    restore_graph(data);
+}
+
 async function toggle_privacy() {
     await call_api('toggle_privacy', { node: selectedNode });
     update_display_text(selectedNode)
