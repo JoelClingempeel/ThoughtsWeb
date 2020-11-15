@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+{% block main %}
+<h4> Current Profile Description: </h4>
+{{ description }}
+<h4> Edit Profile Description: </h4>
+<form method="post">
+    {{ form.hidden_tag() }}
+    {{ form.description.label }} <br>  {{ form.description(cols="70", rows="20") }} <br>
+    {{ form.submit() }}
+</form>
+{% endblock %}

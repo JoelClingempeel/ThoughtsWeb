@@ -45,6 +45,12 @@ class Note(db.Model):
     id = db.Column(db.Integer, primary_key=True)
 
 
+class ProfileDescription(db.Model):
+    __tablename__ = 'profile_descriptions'
+    username = db.Column(db.String(64), primary_key=True)
+    description = db.Column(db.String(3000))
+
+
 class LoginForm(FlaskForm):
     name = StringField('What is your name?', validators=[DataRequired()])
     password = PasswordField('Enter the password.')
@@ -61,6 +67,11 @@ class SignupForm(FlaskForm):
 
 class EditNoteForm(FlaskForm):
     text = TextAreaField('')
+    submit = SubmitField('submit')
+
+
+class EditProfile(FlaskForm):
+    description = TextAreaField('Please enter your profile description here.', validators=[DataRequired()])
     submit = SubmitField('submit')
 
 
@@ -99,6 +110,9 @@ def signup():
             password = form.password1.data
             new_user = User(username=name, password=password)
             db.session.add(new_user)
+            new_profile_description = ProfileDescription(username=name,
+                                                         description='This user does not yet have a description.')
+            db.session.add(new_profile_description)
             db.session.commit()
             session['name'] = form.name.data
             return redirect(url_for('index'))
@@ -121,6 +135,31 @@ def show_error(type):
                       }
     error = error_messages[type]
     return render_template('error.html', error=error)
+
+
+@app.route('/profile/<user>')
+def profile(user):
+    # TODO error handling
+    user_description = ProfileDescription.query.filter_by(username=user).first().description
+    return render_template('profile.html', user=user, description=user_description)
+
+
+@app.route('/searchusers')
+def searchusers():
+    query = request.args.get('user_query')
+    raw_users = User.query.filter(User.username.contains(query)).all()
+    users = [user.username for user in raw_users]
+    return render_template('searchusers.html', users=users)
+
+
+@app.route('/editprofile', methods=['GET', 'POST'])
+def editprofile():
+    current_description = ProfileDescription.query.filter_by(username=session['name']).first()
+    profile_form = EditProfile()
+    if request.method == 'POST':
+        current_description.description = profile_form.description.data
+        db.session.commit()
+    return render_template('editprofile.html', description=current_description.description, form=profile_form)
 
 
 @app.route('/graph')
@@ -293,7 +332,7 @@ def get_neighbors():
 def get_global_neighbors():
     in_edges = Edge.query.filter_by(sink=request.get_json()['node']).all()
     out_edges = Edge.query.filter_by(source=request.get_json()['node']).all()
-    node_labels = [edge.source for edge in in_edges if edge.username != session['name']] +\
+    node_labels = [edge.source for edge in in_edges if edge.username != session['name']] + \
                   [edge.sink for edge in out_edges if edge.username != session['name']]
 
     nodes = []
