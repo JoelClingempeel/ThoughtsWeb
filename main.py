@@ -271,6 +271,32 @@ def get_neighbors():
     return json.dumps({'nodes': nodes, 'edges': edges})
 
 
+@app.route('/get_global_neighbors', methods=['POST'])
+def get_global_neighbors():
+    in_edges = Edge.query.filter_by(sink=request.get_json()['node']).all()
+    out_edges = Edge.query.filter_by(source=request.get_json()['node']).all()
+    node_labels = [edge.source for edge in in_edges if edge.username != session['name']] +\
+                  [edge.sink for edge in out_edges if edge.username != session['name']]
+
+    nodes = []
+    for label in node_labels:
+        node = Node.query.filter_by(label=label,
+                                    private=False,
+                                    type='entity').first()
+        if node and node.username != session['name']:
+            nodes.append([node.label, 'global_entity'])
+    node_labels.append(request.get_json()['node'])  # Needed for finding edge relations
+
+    edges = []
+    all_edges = Edge.query.all()
+    for edge in all_edges:
+        if (edge.source in node_labels and edge.sink in node_labels
+                and edge.type != 'note' and edge.username != session['name']):
+            edges.append([edge.source, edge.sink, edge.label])
+
+    return json.dumps({'nodes': nodes, 'edges': edges})
+
+
 @app.route('/get_notes', methods=['POST'])
 def get_notes():
     note_edges = Edge.query.filter_by(sink=request.get_json()['node'],

@@ -70,7 +70,12 @@ function restore_graph(data) {
             if (node[1] == 'entity') {
                 network.body.data.nodes.add([{ id: node[0],
                                                label: node[0] }]);
-            } else {
+            } else if (node[1] == 'global_entity') {
+                network.body.data.nodes.add([{ id: node[0],
+                                               label: node[0],
+                                               color: 'green' }]);
+            }
+            else {
                 network.body.data.nodes.add([{ id: node[0],
                                                label: node[0],
                                                color: 'red' }]);
@@ -117,6 +122,14 @@ async function expand_node() {
         return;
     }
     let data = await call_api('get_neighbors', { node: selectedNode });
+    restore_graph(data);
+}
+
+async function global_expand_node() {
+    if (selectedNode == '') {
+        return;
+    }
+    let data = await call_api('get_global_neighbors', { node: selectedNode });
     restore_graph(data);
 }
 
