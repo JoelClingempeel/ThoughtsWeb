@@ -194,10 +194,14 @@ def remove_edge():
 
 
 @app.route('/get_node_data', methods=['POST'])
-def get_node_data():
+def get_node_data():  # TODO Add better handling of global nodes.
     # Get privacy.
     private = Node.query.filter_by(label=request.get_json()['node'],
-                                   username=session['name']).first().private
+                                   username=session['name']).first()
+    if private:
+        private = private.private
+    else:
+        private = False
     # Get Note count.
     num_notes = Edge.query.filter_by(sink=request.get_json()['node'],
                                      username=session['name'],
@@ -311,6 +315,27 @@ def get_notes():
 
     edges = []
     all_edges = Edge.query.filter_by(username=session['name']).all()
+    for edge in all_edges:
+        if edge.source in node_labels and edge.sink == request.get_json()['node']:
+            edges.append([edge.source, edge.sink, edge.label])
+
+    return json.dumps({'nodes': nodes, 'edges': edges})
+
+
+@app.route('/get_global_notes', methods=['POST'])
+def get_global_notes():
+    note_edges = Edge.query.filter_by(sink=request.get_json()['node'],
+                                      type='note').all()
+    nodes = []
+    for edge in note_edges:
+        node = Node.query.filter_by(label=edge.source,
+                                    private=False).first()
+        if node:
+            nodes.append([node.label, 'global_note'])
+    node_labels = [node[0] for node in nodes]
+
+    edges = []
+    all_edges = Edge.query.filter_by().all()
     for edge in all_edges:
         if edge.source in node_labels and edge.sink == request.get_json()['node']:
             edges.append([edge.source, edge.sink, edge.label])

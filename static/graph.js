@@ -75,7 +75,11 @@ function restore_graph(data) {
                                                label: node[0],
                                                color: 'green' }]);
             }
-            else {
+            else if (node[1] == 'global_note') {
+                network.body.data.nodes.add([{ id: node[0],
+                                               label: node[0],
+                                               color: 'purple' }]);
+            } else {
                 network.body.data.nodes.add([{ id: node[0],
                                                label: node[0],
                                                color: 'red' }]);
@@ -145,6 +149,14 @@ async function show_notes() {
         return;
     }
     let data = await call_api('get_notes', { node: selectedNode });
+    restore_graph(data);
+}
+
+async function global_show_notes() {
+    if (selectedNode == '') {
+        return;
+    }
+    let data = await call_api('get_global_notes', { node: selectedNode });
     restore_graph(data);
 }
 
