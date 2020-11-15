@@ -31,8 +31,12 @@ async function update_display_text(node) {
         document.getElementById('note_display').innerHTML = '';
         return;
     }
+
     let display_text = await call_api('get_node_data', { node: node });
+
+    // For non-global nodes, get privacy status and number of notes owned by user.
     if (display_text['is_global' == 'False']) {
+        // Privacy status.
         if (display_text['private'] == 'True') {
             document.getElementById('privacy_display').innerHTML = 'This node is currently <b>private</b>.  ' +
             '<button onclick="toggle_privacy();">Toggle Privacy</button>';
@@ -40,6 +44,8 @@ async function update_display_text(node) {
             document.getElementById('privacy_display').innerHTML = 'This node is currently <b>public</b>.  ' +
             '<button onclick="toggle_privacy();">Toggle Privacy</button>';
         }
+
+        // Note count.
         if (display_text['num_notes'] != '0' && display_text['note'] == '') {
             document.getElementById('note_count').innerHTML = 'Notes:  ' + display_text['num_notes'] +
             '<button onclick="show_notes();">Show Notes</button> <button onclick="hide_notes();">Hide Notes</button>';
@@ -49,6 +55,8 @@ async function update_display_text(node) {
             document.getElementById('note_count').innerHTML = '';
         }
     }
+
+    // For global nodes, get count of all notes.
     if (display_text['num_global_notes'] != '0') {
         document.getElementById('global_note_count').innerHTML = 'Global Notes:  ' + display_text['num_global_notes'] +
         '<button onclick="global_show_notes();">Show Global Notes</button>';
@@ -57,6 +65,16 @@ async function update_display_text(node) {
     } else {
         document.getElementById('global_note_count').innerHTML = '';
     }
+
+    // Show other users.
+    var users_html = ''
+    for (i = 0; i < display_text['other_users'].length; i++) {
+        users_html += ('<a href="profile/' + display_text['other_users'][i] + '"> '
+                       + display_text['other_users'][i] + ' </a><br/>')
+    }
+    document.getElementById('other_users').innerHTML = users_html;
+
+    // Note display.
     document.getElementById('note_display').innerHTML = display_text['note'];
 }
 

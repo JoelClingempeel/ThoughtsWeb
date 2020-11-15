@@ -243,10 +243,12 @@ def get_node_data():  # TODO Add better handling of global nodes.
     else:
         is_global = True
         private = False
+
     # Get Note count.
     num_notes = Edge.query.filter_by(sink=request.get_json()['node'],
                                      username=session['name'],
                                      type='note').count()
+
     # Get Global Note count.
     num_global_notes = 0
     global_note_edges = Edge.query.filter_by(sink=request.get_json()['node'],
@@ -256,6 +258,7 @@ def get_node_data():  # TODO Add better handling of global nodes.
         for node in note_nodes:
             if node.username != session['name']:
                 num_global_notes += 1
+
     # Get note (if applicable).
     note = Note.query.filter_by(node=request.get_json()['node']).first()
     if note:
@@ -266,10 +269,21 @@ def get_node_data():  # TODO Add better handling of global nodes.
             note_data = note.text
     else:
         note_data = ''
+
+    # Get other users (for global nodes).
+    if is_global:
+        other_user_nodes = Node.query.filter_by(label=request.get_json()['node'],
+                                                private=False).all()
+        other_users = [node.username for node in other_user_nodes
+                       if node.username != session['name']]
+    else:
+        other_users = []
+
     return json.dumps({'is_global': str(is_global),
                        'private': str(private),
                        'num_notes': str(num_notes),
                        'num_global_notes': str(num_global_notes),
+                       'other_users': other_users,
                        'note': note_data})
 
 
