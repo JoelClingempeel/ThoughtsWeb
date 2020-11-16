@@ -1,5 +1,9 @@
 {% extends 'base.html' %}
 {% block main %}
+<center>
+  <h1> {{ user }} </h1>
+  <a href="{{ url_for('message', user=user) }}"> message </a>
+</center>
 {% if session['name'] == user %}
   Your are currently viewing your own profile.
   <br>

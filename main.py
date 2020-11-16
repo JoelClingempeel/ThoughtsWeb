@@ -51,6 +51,14 @@ class ProfileDescription(db.Model):
     description = db.Column(db.String(3000))
 
 
+class Message(db.Model):
+    __tablename__ = 'messages'
+    id = db.Column(db.Integer, primary_key=True)
+    user1 = db.Column(db.String(64))
+    user2 = db.Column(db.String(64))
+    text = db.Column(db.String(1000))
+
+
 class LoginForm(FlaskForm):
     name = StringField('What is your name?', validators=[DataRequired()])
     password = PasswordField('Enter the password.')
@@ -72,6 +80,11 @@ class EditNoteForm(FlaskForm):
 
 class EditProfile(FlaskForm):
     description = TextAreaField('Please enter your profile description here.', validators=[DataRequired()])
+    submit = SubmitField('submit')
+
+
+class SendMessage(FlaskForm):
+    message = TextAreaField('Please enter your message here.', validators=[DataRequired()])
     submit = SubmitField('submit')
 
 
@@ -162,6 +175,31 @@ def editprofile():
     return render_template('editprofile.html', description=current_description.description, form=profile_form)
 
 
+@app.route('/message/<user>', methods=['GET', 'POST'])
+def message(user):
+    if not session.get('name'):  # Add error message on redirect.
+        return redirect(url_for('login'))
+    # TODO need to validate other user exists and is not you
+    # Get existing messages
+    display_list = []
+    existing_sent_messages = Message.query.filter_by(user1=session.get('name'), user2=user).all()
+    for msg in existing_sent_messages:
+        display_list.append([msg.id, msg.user1, msg.text])
+    existing_received_messages = Message.query.filter_by(user2=session.get('name'), user1=user).all()
+    for msg in existing_received_messages:
+        display_list.append([msg.id, msg.user1, msg.text])
+    display_list.sort()
+    display_list = [msg[1:] for msg in display_list]
+    # Handle new messages
+    message_form = SendMessage()
+    if request.method == 'POST':
+        new_message = Message(user1=session.get('name'), user2=user, text=message_form.message.data)
+        db.session.add(new_message)
+        db.session.commit()
+        display_list.append([session.get('name'), message_form.message.data])
+    return render_template('message.html', display_list=display_list, form=message_form)
+
+
 @app.route('/graph')
 def graph():
     return render_template("graph.html")
@@ -179,7 +217,7 @@ def trending():
     note_edges = Edge.query.filter_by(type='note')
     note_counts = {}
     for edge in note_edges:
-        note_counts[edge.sink] = note_counts.get(edge.sink, 0) +\
+        note_counts[edge.sink] = note_counts.get(edge.sink, 0) + \
                                  Node.query.filter_by(label=edge.sink, private=False).count()
 
     data = []
