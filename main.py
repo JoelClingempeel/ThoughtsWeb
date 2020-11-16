@@ -175,6 +175,16 @@ def editprofile():
     return render_template('editprofile.html', description=current_description.description, form=profile_form)
 
 
+@app.route('/messages')
+def messages():
+    if not session.get('name'):  # Add error message on redirect.
+        return redirect(url_for('login'))
+    sent_messages = Message.query.filter_by(user1=session.get('name')).all()
+    received_messages = Message.query.filter_by(user2=session.get('name')).all()
+    user_list = [msg.user2 for msg in sent_messages] + [msg.user1 for msg in received_messages]
+    return render_template('messages.html', user_list=list(set(user_list)))
+
+
 @app.route('/message/<user>', methods=['GET', 'POST'])
 def message(user):
     if not session.get('name'):  # Add error message on redirect.
