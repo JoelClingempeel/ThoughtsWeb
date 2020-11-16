@@ -19,6 +19,7 @@
   {% endif %}
   <a href="{{ url_for('index') }}"> Home </a>
   <a href="{{ url_for('graph') }}"> Explore Graph </a>
+  <a href="{{ url_for('trending') }}"> Trending </a>
   {% if session.get('name') %}
     <!-- TODO add profile here -->
     <a href="{{ url_for('logout') }}"> Logout </a>

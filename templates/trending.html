@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+{% block main %}
+<style>
+table, th, td {
+  border: 1px solid black;
+}
+</style>
+
+<h1>Trending Nodes</h1>
+<table>
+    <tr>
+        <th> Node </th>
+        <th> User Count </th>
+        <th> Total Notes Per Node </th>
+    </tr>
+    {% for entry in data %}
+        <tr>
+            <td> {{ entry[2] }} </td>
+            <td> {{ entry[0] }} </td>
+            <td> {{ entry[1] }} </td>
+        </tr>
+    {% endfor %}
+</table>
+<br />
+Note that private nodes are excluded from the above counts.
+{% endblock %}

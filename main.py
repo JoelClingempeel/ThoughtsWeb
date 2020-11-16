@@ -167,6 +167,28 @@ def graph():
     return render_template("graph.html")
 
 
+@app.route('/trending')
+def trending():
+    # Get node counts.
+    nodes = Node.query.filter_by(private=False).all()
+    counts = {}
+    for node in nodes:
+        counts[node.label] = counts.get(node.label, 0) + 1
+
+    # Get note counts.
+    note_edges = Edge.query.filter_by(type='note')
+    note_counts = {}
+    for edge in note_edges:
+        note_counts[edge.sink] = note_counts.get(edge.sink, 0) +\
+                                 Node.query.filter_by(label=edge.sink, private=False).count()
+
+    data = []
+    for node, count in counts.items():
+        data.append([count, note_counts.get(node, 0), node])
+    data.sort(reverse=True)
+    return render_template("trending.html", data=data)
+
+
 @app.route('/edit_note/<node>', methods=['GET', 'POST'])
 def edit_note(node):
     current_text = Note.query.filter_by(node=node, username=session['name']).first()
