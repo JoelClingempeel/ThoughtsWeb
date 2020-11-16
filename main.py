@@ -175,6 +175,11 @@ def editprofile():
     return render_template('editprofile.html', description=current_description.description, form=profile_form)
 
 
+@app.route('/about')
+def about():
+    return render_template('about.html')
+
+
 @app.route('/messages')
 def messages():
     if not session.get('name'):  # Add error message on redirect.
