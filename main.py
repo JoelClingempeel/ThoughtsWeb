@@ -270,6 +270,7 @@ def add_node():
     db.session.commit()
     response = jsonify({})
     response.headers.add('Access-Control-Allow-Origin', '*')
+    response.headers.add('Access-Control-Allow-Methods', 'GET, POST')
     return response
 
 
@@ -289,6 +290,7 @@ def remove_node():
     db.session.commit()
     response = jsonify({})
     response.headers.add('Access-Control-Allow-Origin', '*')
+    response.headers.add('Access-Control-Allow-Methods', 'GET, POST')
     return response
 
 
@@ -303,6 +305,7 @@ def add_edge():
     db.session.commit()
     response = jsonify({})
     response.headers.add('Access-Control-Allow-Origin', '*')
+    response.headers.add('Access-Control-Allow-Methods', 'GET, POST')
     return response
 
 
@@ -315,6 +318,7 @@ def remove_edge():
     db.session.commit()
     response = jsonify({})
     response.headers.add('Access-Control-Allow-Origin', '*')
+    response.headers.add('Access-Control-Allow-Methods', 'GET, POST')
     return response
 
 
@@ -372,6 +376,7 @@ def get_node_data():  # TODO Add better handling of global nodes.
                         'other_users': other_users,
                         'note': note_data})
     response.headers.add('Access-Control-Allow-Origin', '*')
+    response.headers.add('Access-Control-Allow-Methods', 'GET, POST')
     return response
 
 
@@ -383,6 +388,7 @@ def graph_snapshot():
                         'edges': [[edge.source, edge.sink, edge.label]
                                   for edge in edges if edge.type != 'note']})
     response.headers.add('Access-Control-Allow-Origin', '*')
+    response.headers.add('Access-Control-Allow-Methods', 'GET, POST')
     return response
 
 
@@ -406,6 +412,7 @@ def get_children():
 
     response = jsonify({'nodes': nodes, 'edges': edges})
     response.headers.add('Access-Control-Allow-Origin', '*')
+    response.headers.add('Access-Control-Allow-Methods', 'GET, POST')
     return response
 
 
@@ -433,6 +440,7 @@ def get_neighbors():
 
     response = jsonify({'nodes': nodes, 'edges': edges})
     response.headers.add('Access-Control-Allow-Origin', '*')
+    response.headers.add('Access-Control-Allow-Methods', 'GET, POST')
     return response
 
 
@@ -461,6 +469,7 @@ def get_global_neighbors():
 
     response = jsonify({'nodes': nodes, 'edges': edges})
     response.headers.add('Access-Control-Allow-Origin', '*')
+    response.headers.add('Access-Control-Allow-Methods', 'GET, POST')
     return response
 
 
@@ -484,6 +493,7 @@ def get_notes():
 
     response = jsonify({'nodes': nodes, 'edges': edges})
     response.headers.add('Access-Control-Allow-Origin', '*')
+    response.headers.add('Access-Control-Allow-Methods', 'GET, POST')
     return response
 
 
@@ -507,6 +517,7 @@ def get_global_notes():
 
     response = jsonify({'nodes': nodes, 'edges': edges})
     response.headers.add('Access-Control-Allow-Origin', '*')
+    response.headers.add('Access-Control-Allow-Methods', 'GET, POST')
     return response
 
 
@@ -519,6 +530,7 @@ def node_search():
                if query in node.label]
     response = jsonify({'nodes': results, 'edges': []})
     response.headers.add('Access-Control-Allow-Origin', '*')
+    response.headers.add('Access-Control-Allow-Methods', 'GET, POST')
     return response
 
 
@@ -530,6 +542,7 @@ def toggle_privacy():
     db.session.commit()
     response = jsonify({})
     response.headers.add('Access-Control-Allow-Origin', '*')
+    response.headers.add('Access-Control-Allow-Methods', 'GET, POST')
     return response
 
 
