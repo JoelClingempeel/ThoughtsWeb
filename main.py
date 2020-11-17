@@ -1,4 +1,6 @@
 import json
+import os
+
 from flask import render_template, session, request, redirect, url_for, Flask
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, SubmitField, TextAreaField
@@ -7,12 +9,13 @@ from flask_sqlalchemy import SQLAlchemy
 
 from config import password, uri
 
+
 mode = 'prod'
 
 app = Flask('__name__')
 if mode == 'prod':
-    app.config['SECRET_KEY'] = password
-    app.config['SQL_ALCHEMY_DATABASE_URI'] = uri
+    app.config['SECRET_KEY'] = os.environ.get('SQLALCHEMY_DATABASE_URI')
+    app.config['SQL_ALCHEMY_DATABASE_URI'] = os.environ.get('SECRET_KEY')
 else:
     app.config['SECRET_KEY'] = 'blairehasmyheart'
     app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://localhost/thoughtsweb'
