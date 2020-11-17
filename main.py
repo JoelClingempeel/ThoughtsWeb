@@ -78,7 +78,6 @@ class SignupForm(FlaskForm):
     name = StringField('What is your name?', validators=[DataRequired()])
     password1 = PasswordField('Enter the password.')
     password2 = PasswordField('Verify the password.')
-    password_beta = PasswordField('Enter your beta testing password.')
     submit = SubmitField('submit')
 
 
