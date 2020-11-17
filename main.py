@@ -348,7 +348,7 @@ def get_node_data():  # TODO Add better handling of global nodes.
     if note:
         # TODO Remove using explicit link.
         if note.username == session['name']:
-            note_data = f'<a href="http://127.0.0.1:5000/edit_note/{note.node}"> Edit </a> <br />' + note.text
+            note_data = f'<a href="edit_note/{note.node}"> Edit </a> <br />' + note.text
         else:
             note_data = note.text
     else:
