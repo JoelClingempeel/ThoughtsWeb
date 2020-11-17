@@ -266,7 +266,8 @@ def edit_note(node):
 def add_node():
     node = Node(label=request.get_json()['label'],
                 username=session['name'],
-                type=request.get_json()['type'])
+                type=request.get_json()['type'],
+                private=True)
     db.session.add(node)
     if request.get_json()['type'] == 'note':
         note = Note(node=request.get_json()['label'],
