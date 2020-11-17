@@ -1,10 +1,12 @@
+import json
 import os
 
-from flask import jsonify, render_template, session, request, redirect, url_for, Flask
+from flask import render_template, session, request, Response, redirect, url_for, Flask
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, SubmitField, TextAreaField
 from wtforms.validators import DataRequired
 from flask_sqlalchemy import SQLAlchemy
+
 
 mode = 'prod'
 
@@ -92,6 +94,12 @@ class EditProfile(FlaskForm):
 class SendMessage(FlaskForm):
     message = TextAreaField('Please enter your message here.', validators=[DataRequired()])
     submit = SubmitField('submit')
+
+
+def format_api_response(data):
+    response = Response(json.dumps(data))
+    response.headers['Access-Control-Allow-Origin'] = '*'
+    return response
 
 
 @app.route('/')
@@ -268,10 +276,7 @@ def add_node():
                     username=session['name'])
         db.session.add(note)
     db.session.commit()
-    response = jsonify({})
-    response.headers.add('Access-Control-Allow-Origin', '*')
-    response.headers.add('Access-Control-Allow-Methods', 'GET, POST')
-    return response
+    return format_api_response({})
 
 
 @app.route('/remove_node', methods=['POST'])
@@ -288,10 +293,7 @@ def remove_node():
     Edge.query.filter_by(sink=request.get_json()['label'],
                          username=session['name']).delete()
     db.session.commit()
-    response = jsonify({})
-    response.headers.add('Access-Control-Allow-Origin', '*')
-    response.headers.add('Access-Control-Allow-Methods', 'GET, POST')
-    return response
+    return format_api_response({})
 
 
 @app.route('/add_edge', methods=['POST'])
@@ -303,10 +305,7 @@ def add_edge():
                 type=request.get_json()['type'])
     db.session.add(edge)
     db.session.commit()
-    response = jsonify({})
-    response.headers.add('Access-Control-Allow-Origin', '*')
-    response.headers.add('Access-Control-Allow-Methods', 'GET, POST')
-    return response
+    return format_api_response({})
 
 
 @app.route('/remove_edge', methods=['POST'])
@@ -316,10 +315,7 @@ def remove_edge():
                                 username=session['name']).first()
     db.session.delete(edge)
     db.session.commit()
-    response = jsonify({})
-    response.headers.add('Access-Control-Allow-Origin', '*')
-    response.headers.add('Access-Control-Allow-Methods', 'GET, POST')
-    return response
+    return format_api_response({})
 
 
 @app.route('/get_node_data', methods=['POST'])
@@ -369,27 +365,21 @@ def get_node_data():  # TODO Add better handling of global nodes.
     else:
         other_users = []
 
-    response = jsonify({'is_global': str(is_global),
-                        'private': str(private),
-                        'num_notes': str(num_notes),
-                        'num_global_notes': str(num_global_notes),
-                        'other_users': other_users,
-                        'note': note_data})
-    response.headers.add('Access-Control-Allow-Origin', '*')
-    response.headers.add('Access-Control-Allow-Methods', 'GET, POST')
-    return response
+    return format_api_response({'is_global': str(is_global),
+                                'private': str(private),
+                                'num_notes': str(num_notes),
+                                'num_global_notes': str(num_global_notes),
+                                'other_users': other_users,
+                                'note': note_data})
 
 
 @app.route('/graph_snapshot', methods=['POST'])
 def graph_snapshot():
     nodes = Node.query.filter_by(username=session['name'], type='entity').all()
     edges = Edge.query.filter_by(username=session['name']).all()
-    response = jsonify({'nodes': [[node.label, node.type] for node in nodes],
-                        'edges': [[edge.source, edge.sink, edge.label]
-                                  for edge in edges if edge.type != 'note']})
-    response.headers.add('Access-Control-Allow-Origin', '*')
-    response.headers.add('Access-Control-Allow-Methods', 'GET, POST')
-    return response
+    return format_api_response({'nodes': [[node.label, node.type] for node in nodes],
+                                'edges': [[edge.source, edge.sink, edge.label]
+                                           for edge in edges if edge.type != 'note']})
 
 
 @app.route('/get_children', methods=['POST'])
@@ -410,10 +400,7 @@ def get_children():
         if edge.source in node_labels and edge.sink in node_labels:
             edges.append([edge.source, edge.sink, edge.label])
 
-    response = jsonify({'nodes': nodes, 'edges': edges})
-    response.headers.add('Access-Control-Allow-Origin', '*')
-    response.headers.add('Access-Control-Allow-Methods', 'GET, POST')
-    return response
+    return format_api_response({'nodes': nodes, 'edges': edges})
 
 
 @app.route('/get_neighbors', methods=['POST'])
@@ -438,10 +425,7 @@ def get_neighbors():
         if edge.source in node_labels and edge.sink in node_labels and edge.type != 'note':
             edges.append([edge.source, edge.sink, edge.label])
 
-    response = jsonify({'nodes': nodes, 'edges': edges})
-    response.headers.add('Access-Control-Allow-Origin', '*')
-    response.headers.add('Access-Control-Allow-Methods', 'GET, POST')
-    return response
+    return format_api_response({'nodes': nodes, 'edges': edges})
 
 
 @app.route('/get_global_neighbors', methods=['POST'])
@@ -467,10 +451,7 @@ def get_global_neighbors():
                 and edge.type != 'note' and edge.username != session['name']):
             edges.append([edge.source, edge.sink, edge.label])
 
-    response = jsonify({'nodes': nodes, 'edges': edges})
-    response.headers.add('Access-Control-Allow-Origin', '*')
-    response.headers.add('Access-Control-Allow-Methods', 'GET, POST')
-    return response
+    return format_api_response({'nodes': nodes, 'edges': edges})
 
 
 @app.route('/get_notes', methods=['POST'])
@@ -491,10 +472,7 @@ def get_notes():
         if edge.source in node_labels and edge.sink == request.get_json()['node']:
             edges.append([edge.source, edge.sink, edge.label])
 
-    response = jsonify({'nodes': nodes, 'edges': edges})
-    response.headers.add('Access-Control-Allow-Origin', '*')
-    response.headers.add('Access-Control-Allow-Methods', 'GET, POST')
-    return response
+    return format_api_response({'nodes': nodes, 'edges': edges})
 
 
 @app.route('/get_global_notes', methods=['POST'])
@@ -515,10 +493,7 @@ def get_global_notes():
         if edge.source in node_labels and edge.sink == request.get_json()['node']:
             edges.append([edge.source, edge.sink, edge.label])
 
-    response = jsonify({'nodes': nodes, 'edges': edges})
-    response.headers.add('Access-Control-Allow-Origin', '*')
-    response.headers.add('Access-Control-Allow-Methods', 'GET, POST')
-    return response
+    return format_api_response({'nodes': nodes, 'edges': edges})
 
 
 @app.route('/node_search', methods=['POST'])
@@ -528,10 +503,7 @@ def node_search():
                                  private=False).all()
     results = [[node.label, 'global_entity'] for node in nodes
                if query in node.label]
-    response = jsonify({'nodes': results, 'edges': []})
-    response.headers.add('Access-Control-Allow-Origin', '*')
-    response.headers.add('Access-Control-Allow-Methods', 'GET, POST')
-    return response
+    return format_api_response({'nodes': results, 'edges': []})
 
 
 @app.route('/toggle_privacy', methods=['POST'])
@@ -540,10 +512,7 @@ def toggle_privacy():
                                 username=session['name']).first()
     node.private = not node.private
     db.session.commit()
-    response = jsonify({})
-    response.headers.add('Access-Control-Allow-Origin', '*')
-    response.headers.add('Access-Control-Allow-Methods', 'GET, POST')
-    return response
+    return format_api_response({})
 
 
 if __name__ == '__main__':
