@@ -1,4 +1,4 @@
-const url = 'https://cors-anywhere.herokuapp.com/https://thoughtsweb.herokuapp.com/'
+const url = 'https://thoughtsweb.herokuapp.com/'
 
 var data = {
     nodes: new vis.DataSet([]),

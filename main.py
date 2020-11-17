@@ -6,11 +6,15 @@ from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, SubmitField, TextAreaField
 from wtforms.validators import DataRequired
 from flask_sqlalchemy import SQLAlchemy
+from flask_cors import CORS, cross_origin
 
+
+app = Flask('__name__')
+cors = CORS(app)
+app.config['CORS_HEADERS'] = 'Content-Type'
 
 mode = 'prod'
 
-app = Flask('__name__')
 if mode == 'prod':
     app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY')
     app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL')
@@ -258,6 +262,7 @@ def edit_note(node):
 
 
 @app.route('/add_node', methods=['POST'])
+@cross_origin()
 def add_node():
     node = Node(label=request.get_json()['label'],
                 username=session['name'],
@@ -274,6 +279,7 @@ def add_node():
 
 
 @app.route('/remove_node', methods=['POST'])
+@cross_origin()
 def remove_node():
     node = Node.query.filter_by(label=request.get_json()['label'],
                                 username=session['name']).first()
@@ -291,6 +297,7 @@ def remove_node():
 
 
 @app.route('/add_edge', methods=['POST'])
+@cross_origin()
 def add_edge():
     edge = Edge(source=request.get_json()['source'],
                 sink=request.get_json()['sink'],
@@ -303,6 +310,7 @@ def add_edge():
 
 
 @app.route('/remove_edge', methods=['POST'])
+@cross_origin()
 def remove_edge():
     edge = Edge.query.filter_by(source=request.get_json()['source'],
                                 sink=request.get_json()['sink'],
@@ -313,6 +321,7 @@ def remove_edge():
 
 
 @app.route('/get_node_data', methods=['POST'])
+@cross_origin()
 def get_node_data():  # TODO Add better handling of global nodes.
     # Get global-ness and privacy.
     node_ob = Node.query.filter_by(label=request.get_json()['node'],
@@ -368,6 +377,7 @@ def get_node_data():  # TODO Add better handling of global nodes.
 
 
 @app.route('/graph_snapshot', methods=['POST'])
+@cross_origin()
 def graph_snapshot():
     nodes = Node.query.filter_by(username=session['name'], type='entity').all()
     edges = Edge.query.filter_by(username=session['name']).all()
@@ -377,6 +387,7 @@ def graph_snapshot():
 
 
 @app.route('/get_children', methods=['POST'])
+@cross_origin()
 def get_children():
     children = Edge.query.filter_by(sink=request.get_json()['root'],
                                     username=session['name'],
@@ -398,6 +409,7 @@ def get_children():
 
 
 @app.route('/get_neighbors', methods=['POST'])
+@cross_origin()
 def get_neighbors():
     in_edges = Edge.query.filter_by(sink=request.get_json()['node'],
                                     username=session['name']).all()
@@ -423,6 +435,7 @@ def get_neighbors():
 
 
 @app.route('/get_global_neighbors', methods=['POST'])
+@cross_origin()
 def get_global_neighbors():
     in_edges = Edge.query.filter_by(sink=request.get_json()['node']).all()
     out_edges = Edge.query.filter_by(source=request.get_json()['node']).all()
@@ -449,6 +462,7 @@ def get_global_neighbors():
 
 
 @app.route('/get_notes', methods=['POST'])
+@cross_origin()
 def get_notes():
     note_edges = Edge.query.filter_by(sink=request.get_json()['node'],
                                       username=session['name'],
@@ -470,6 +484,7 @@ def get_notes():
 
 
 @app.route('/get_global_notes', methods=['POST'])
+@cross_origin()
 def get_global_notes():
     note_edges = Edge.query.filter_by(sink=request.get_json()['node'],
                                       type='note').all()
@@ -491,6 +506,7 @@ def get_global_notes():
 
 
 @app.route('/node_search', methods=['POST'])
+@cross_origin()
 def node_search():
     query = request.get_json()['query']
     nodes = Node.query.filter_by(type='entity',
@@ -501,6 +517,7 @@ def node_search():
 
 
 @app.route('/toggle_privacy', methods=['POST'])
+@cross_origin()
 def toggle_privacy():
     node = Node.query.filter_by(label=request.get_json()['node'],
                                 username=session['name']).first()
