@@ -5,9 +5,17 @@ from wtforms import StringField, PasswordField, SubmitField, TextAreaField
 from wtforms.validators import DataRequired
 from flask_sqlalchemy import SQLAlchemy
 
+from config import password, uri
+
+mode = 'prod'
+
 app = Flask('__name__')
-app.config['SECRET_KEY'] = 'blairehasmyheart'
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://localhost/thoughtsweb'
+if mode == 'prod':
+    app.config['SECRET_KEY'] = password
+    app.config['SQL_ALCHEMY_DATABASE_URI'] = uri
+else:
+    app.config['SECRET_KEY'] = 'blairehasmyheart'
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://localhost/thoughtsweb'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
