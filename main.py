@@ -121,12 +121,10 @@ def login():
 def signup():
     form = SignupForm()
     if form.validate_on_submit():
-        if User.query.filter_by(username=form.name.data).first():  # TODO Check if username is taken.
+        if User.query.filter_by(username=form.name.data).first():
             return redirect('error/username_taken')
         elif form.password1.data != form.password2.data:
             return redirect('error/password_mismatch')
-        elif form.password_beta.data != 'dinoeats314':
-            return redirect('error/invalid_beta_password')
         else:
             name = form.name.data
             password = form.password1.data
@@ -152,9 +150,7 @@ def show_error(type):
     error_messages = {'invalid_username': 'The username you entered does not exist',
                       'invalid_password': 'Invalid password!',
                       'username_taken': 'The username you chose is already taken.',
-                      'password_mismatch': 'The passwords you entered do not match.',
-                      'invalid_beta_password': 'The beta testing password you entered is incorrect.'
-                      }
+                      'password_mismatch': 'The passwords you entered do not match.'}
     error = error_messages[type]
     return render_template('error.html', error=error)
 
