@@ -35,7 +35,7 @@ async function update_display_text(node) {
     let display_text = await call_api('get_node_data', { node: node });
 
     // For non-global nodes, get privacy status and number of notes owned by user.
-    if (display_text['is_global' == 'False']) {
+    if (display_text['is_global'] == 'False') {
         // Privacy status.
         if (display_text['private'] == 'True') {
             document.getElementById('privacy_display').innerHTML = 'This node is currently <b>private</b>.  ' +
