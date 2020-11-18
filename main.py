@@ -1,5 +1,6 @@
 import json
 import os
+import sys
 
 from flask import render_template, session, request, redirect, url_for, Flask
 from flask_wtf import FlaskForm
@@ -8,15 +9,14 @@ from wtforms.validators import DataRequired
 from flask_sqlalchemy import SQLAlchemy
 
 
-mode = 'prod'
-
 app = Flask('__name__')
-if mode == 'prod':
-    app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY')
-    app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL')
-else:
+if sys.argv[1] == '--test':
     app.config['SECRET_KEY'] = 'blairehasmyheart'
     app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://localhost/thoughtsweb'
+else:
+    app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY')
+    app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL')
+
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
