@@ -10,13 +10,13 @@ from flask_sqlalchemy import SQLAlchemy
 
 
 app = Flask('__name__')
+
 if len(sys.argv) > 1 and sys.argv[1] == '--test':
     app.config['SECRET_KEY'] = 'blairehasmyheart'
     app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://localhost/thoughtsweb'
 else:
     app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY')
     app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL')
-
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 

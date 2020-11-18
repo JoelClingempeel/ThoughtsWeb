@@ -1,9 +1,10 @@
 {% extends 'base.html' %}
 {% block main %}
-<h> Sign Up </h>
-<br>
-<br>
-Please signup.
+<h1> Sign Up </h1>
+<b>Caution:</b>  As this website is currently a prototype, please use a <b>new</b> password
+just for this website, and do not upload any overly personal information.
+<br />
+<br />
 <form method="post">
     {{ form.hidden_tag() }}
     {{ form.name.label }} <br>  {{ form.name() }} <br>
