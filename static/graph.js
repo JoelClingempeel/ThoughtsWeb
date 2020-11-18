@@ -13,11 +13,12 @@ async function call_api(query_type, query_data) {
   let myData;
   const response = await fetch(url + query_type, {
     method: 'post',
+    mode: 'no-cors',
     body: JSON.stringify(query_data),
+    xhrFields: {withCredentials: true},
     headers: new Headers({
       'content-type': 'application/json'
-    },
-    xhrFields: {withCredentials: true})
+    })
   }).then(
     response => response.text()
   ).then(
