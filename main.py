@@ -5,12 +5,14 @@ from flask import render_template, session, request, redirect, url_for, Flask
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, SubmitField, TextAreaField
 from wtforms.validators import DataRequired
+from flask_cors import CORS
 from flask_sqlalchemy import SQLAlchemy
 
 
 mode = 'prod'
 
 app = Flask('__name__')
+CORS(app, resources=r'*')
 if mode == 'prod':
     app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY')
     app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL')
