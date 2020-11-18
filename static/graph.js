@@ -16,7 +16,8 @@ async function call_api(query_type, query_data) {
     body: JSON.stringify(query_data),
     headers: new Headers({
       'content-type': 'application/json'
-    })
+    },
+    xhrFields: {withCredentials: true})
   }).then(
     response => response.text()
   ).then(
