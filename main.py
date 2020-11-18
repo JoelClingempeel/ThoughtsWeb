@@ -10,7 +10,7 @@ from flask_sqlalchemy import SQLAlchemy
 
 
 app = Flask('__name__')
-if sys.argv[1] == '--test':
+if len(sys.argv) > 1 and sys.argv[1] == '--test':
     app.config['SECRET_KEY'] = 'blairehasmyheart'
     app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://localhost/thoughtsweb'
 else:
