@@ -1,5 +1,3 @@
-const url = 'thoughtsweb.herokuapp.com/'
-
 var data = {
     nodes: new vis.DataSet([]),
     edges: new vis.DataSet([])
@@ -14,7 +12,6 @@ async function call_api(query_type, query_data) {
   const response = await fetch(query_type, {
     method: 'post',
     body: JSON.stringify(query_data),
-    xhrFields: {withCredentials: true},
     headers: new Headers({
       'content-type': 'application/json'
     })
