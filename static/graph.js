@@ -1,4 +1,4 @@
-const url = 'https://thoughtsweb.herokuapp.com/'
+const url = 'thoughtsweb.herokuapp.com/'
 
 var data = {
     nodes: new vis.DataSet([]),
