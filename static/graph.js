@@ -11,7 +11,7 @@ var node_list;
 
 async function call_api(query_type, query_data) {
   let myData;
-  const response = await fetch(url + query_type, {
+  const response = await fetch(query_type, {
     method: 'post',
     body: JSON.stringify(query_data),
     xhrFields: {withCredentials: true},
