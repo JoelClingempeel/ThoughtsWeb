@@ -1,6 +1,6 @@
 # ThoughtsWeb
 
-ThoughtsWeb is a web application for building personal knowledge graphs and finding connections between the graphs of different users.
+ThoughtsWeb is a Flask-based web application for building personal knowledge graphs and finding connections between the graphs of different users.
 
 **Disclaimer:** This was built in 2020 so some of the methods may be outdated.
 
